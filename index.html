@@ -1,0 +1,56 @@
+<!--index.html-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' * ">
+
+    <title>Video Info App</title>
+</head>
+
+<body>
+    <h1>Hello!</h1>
+    <h2>Select a video below to analyze it</h2>
+    <p>
+        We are using Node.js <span id="node-version"></span>,
+        Chromium <span id="chrome-version"></span>,
+        and Electron <span id="electron-version"></span> for this app.
+    </p>
+    <div>
+        <form>
+            <div>
+                <label>Select Video</label>
+                <input type="file" name="video" accept="video/*">
+            </div>
+            <div>
+                <button type="submit">Analyze</button>
+                <p id="display_duration"></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', e => {
+            e.preventDefault();
+            const file = document.querySelector('input').files[0];
+            const { path } = file;
+            if (!path) {
+                alert('Select a file');
+                return
+            }
+            window.api.send('video:submit', path);
+            window.api.receive('video:receive', data => {
+                document.getElementById('display_duration').innerHTML = `File duration: ${data}s`
+            })
+        })
+    </script>
+    <!-- You can also require other files to run in this process -->
+    <script src="./dist/renderer.js"></script>
+</body>
+
+</html>
